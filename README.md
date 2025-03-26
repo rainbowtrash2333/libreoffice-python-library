@@ -2,17 +2,17 @@
 Use python to manipulate the LibreOffice linux process. This framework can be used to create formatted text documents, pdfs,  spreadsheets or drawings.
 
 ## Prerequisites
-- [python3.x](https://docs.python.org/3/using/unix.html)
+- [python3.5+](https://docs.python.org/3/using/unix.html)
 - [pipenv](https://github.com/pypa/pipenv)
 - [LibreOffice](https://gist.github.com/CosminEugenDinu/d584dddfce534f8272ab9f661eb480a5#file-install_libreoffice-sh)
 
 ## Install
 ```bash
-pipenv install -e "git+https://github.com/CosminEugenDinu/libreoffice-python-library.git#egg=libreoffice-py"
+pipenv install -e "git+https://github.com/rainbowtrash2333/libreoffice-python-library.git#egg=libreoffice-py"
 ```
 
 ## Setup
-- edit [***lo_config.toml***](https://raw.githubusercontent.com/CosminEugenDinu/libreoffice-python-library/main/lo_config.toml) file to match your system configuration (if does not exists, it is created at first run)
+- edit [***lo_config.toml***](https://raw.githubusercontent.com/rainbowtrash2333/libreoffice-python-library/main/lo_config.toml) file to match your system configuration (if does not exists, it is created at first run)
 
 ## Usage
 ```py
