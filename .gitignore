@@ -10,7 +10,7 @@ env/           # 其他常见虚拟环境目录
 *.env          # 环境变量文件（通常含敏感信息）
 
 # --- PyCharm IDE 配置 ---
-.idea/         # PyCharm 项目配置目录
+/.idea/         # PyCharm 项目配置目录
 *.iml          # PyCharm 模块文件
 *.ipr          # PyCharm 项目文件
 *.iws          # PyCharm 工作区文件
