@@ -4,7 +4,8 @@ sys.path.append('.')
 from libreoffice_py import document
 from calendar import Calendar
 from datetime import date
-  
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 today = date.today()
 
 calc = document.Calc()
@@ -32,5 +33,5 @@ for line in data:
 range = sheet.get_range(0, 0, len(data[0])-1, len(data)-1)
 
 range.set_data(data)
-calc.save('./test/testfile.pdf', 'pdf')
+calc.save('./saves/testfile.pdf', 'pdf')
 calc.desktop.terminate()

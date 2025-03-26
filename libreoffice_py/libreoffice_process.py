@@ -8,6 +8,7 @@ sys.path.append(config['libreoffice']['python_uno_location'])
 import uno
 NoConnectException = uno.getClass('com.sun.star.connection.NoConnectException')
 # from com.sun.star.connection import NoConnectException
+import socket
 
 now = time.time
 
@@ -35,36 +36,32 @@ class LOprocess:
         # process ref of running libreoffice set from startup method
         self.loproc = None
         self.desktop = None
+        self.__is_start = False
 
-    def startup(self, port=None):
+
+    def startup(self):
         """ Starts libreoffice process.
         """
-
-        accept_open = self.accept_open % (self.host, (port or self.port))
+        accept_open = self.accept_open % (self.host, self.port)
         # "--accept=%s" => %s is replaced with accept_open
-        # stringify command flags
-        start_command_flags = ' '.join(self.flags) % accept_open
 
-        # command used to start libreoffice with open socket
-        start_command = f"{self.libreoffice_bin} {start_command_flags}"
+        start_command_flags = [s.replace("%s", accept_open) for s in self.flags]
 
-        # if named pipe connection:
-        # "--accept='pipe,name=somepipename;urp;StarOffice.ComponentContext'"
+        start_command =  [self.libreoffice_bin, *start_command_flags]
 
-        lo_proc = subprocess.Popen(start_command, shell=True)
-
-        # I could'n connect to process if opended it like this:
-        # lo_proc = subprocess.Popen(start_command.split())
-
+        # shell=False Cross-platform security
+        lo_proc = subprocess.Popen(start_command,shell=False)
+        self.__is_start = True
         return lo_proc
 
-    def connect(self, host=None, port=None):
-
+    def connect(self):
+        if not self.__is_start:
+            self.startup()
         local_ctx = uno.getComponentContext()
         smgr_local = local_ctx.ServiceManager
         resolver = smgr_local.createInstanceWithContext(
             "com.sun.star.bridge.UnoUrlResolver", local_ctx)
-        url = self.connection_url % (self.host, (port or self.port))
+        url = self.connection_url % (self.host,  self.port)
 
         uno_ctx = None
         # try to resolve connection
@@ -72,25 +69,10 @@ class LOprocess:
             # url = "uno:socket,host=localhost,port=2002,tcpNoDalay=1;urp;StarOffice.ComponentContext"
             # url = "uno:pipe,name=somepipename;urp;StarOffice.ComponentContext"
             uno_ctx = resolver.resolve(url)
-        except NoConnectException as nce:
-            # launch libreoffice process
-            lo_proc = self.startup()
+        except NoConnectException:
+            print(f"connection failed: Make sure soffice is running and port {self.port} is available")
+            exit(1)
 
-            timeout = 0
-            while timeout < self.timeout:
-                # Is it already/still running?
-                retcode = lo_proc.poll()
-                if retcode == 81:
-                    # self.connect()
-                    continue
-                # elif retcode is not None:
-                    # raise
-                try:
-                    uno_ctx = resolver.resolve(url)
-                    break
-                except NoConnectException:
-                    time.sleep(0.5)
-                    timeout += 0.5
 
         return uno_ctx
 
